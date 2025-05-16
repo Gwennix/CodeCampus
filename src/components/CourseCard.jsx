@@ -8,11 +8,6 @@ const CourseCard = ({ course }) => {
       </article>
     );
 
-  const openCourseVideo = (url) => {
-    return () => {
-      console.log('Video URL:', url);
-    };
-  };
 
   return (
     <article className='course-card'>
@@ -38,12 +33,13 @@ const CourseCard = ({ course }) => {
           <span className='rating'>⭐ {course.rating}</span>
         </footer>
         <div className='course-actions'>
+          <a href={course.videoUrl} target='_blank'>
           <button
             className='course-button'
-            onClick={openCourseVideo(course.videoUrl)}
           >
             Bekijk Video
           </button>
+          </a>
         </div>
       </div>
     </article>
