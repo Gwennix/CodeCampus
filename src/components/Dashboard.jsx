@@ -25,6 +25,15 @@ const Dashboard = ({ courseData }) => {
   return (
     <section className='dashboard'>
       <header className='dashboard-header'>
+
+  <div>
+      <select>
+       <option>Populariteit</option>
+       <option>Rating</option>
+       <option>Duur</option>
+     </select>
+   </div>
+   
         <nav className='tab-buttons'>
           <button
             className={activeTab === 'all' ? 'active' : ''}

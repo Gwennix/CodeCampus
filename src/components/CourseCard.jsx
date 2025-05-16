@@ -1,6 +1,8 @@
 import '../styles/CourseCard.css';
+import { useState } from 'react';
 
 const CourseCard = ({ course }) => {
+  const [isOpen, setIsOpen] = useState(false);
   if (!course)
     return (
       <article className='course-card empty'>
@@ -10,6 +12,8 @@ const CourseCard = ({ course }) => {
 
 
   return (
+   <>
+   
     <article className='course-card'>
       <figure className='course-image'>
         <img src={course.imageUrl} alt={course.title} />
@@ -43,6 +47,7 @@ const CourseCard = ({ course }) => {
         </div>
       </div>
     </article>
+    </>
   );
 };
 
