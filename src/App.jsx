@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import Dashboard from './components/Dashboard';
 import { courses } from './data/coursesData.js';
-import SearchBar from './components/SearchBar.jsx';
 import './styles/App.css';
 
 function App() {
@@ -29,10 +28,6 @@ function App() {
         <div className='logo-container'>
           <h1 className='brand-logo'>CodeCampus</h1>
           <p className='brand-tagline'>Ontdek, Leer, Excelleer</p>
-        </div>
-        <div>
-          <h3>Zoeken:</h3>
-          <SearchBar courses={courseData} /> 
         </div>
         
       </header>
