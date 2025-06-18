@@ -25,11 +25,6 @@ const SearchBar = ({ courses }) => {
         value={searchInput}
         onChange={handleChange}
       />
-      <ul>
-        {filteredCourses.map((course) => (
-          <li key={course.id}>{course.name}</li>
-        ))}
-      </ul>
     </div>
   );
 };

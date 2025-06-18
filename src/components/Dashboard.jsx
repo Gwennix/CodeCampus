@@ -1,41 +1,66 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/Dashboard.css";
 import CourseList from "./CourseList";
 import PopularCourses from "./PopularCourses";
 import Statistics from "./Statistics";
-import SearchBar from "./SearchBar.jsx";
 
 const Dashboard = ({ courseData }) => {
   const [activeTab, setActiveTab] = useState("all");
+  const [query, setQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+
 
   const filteredCourses = () => {
     if (!courseData || !Array.isArray(courseData)) return [];
 
-    if (activeTab === "all") {
-      return courseData;
-    } else if (activeTab === "beginner") {
-      return courseData.filter((course) => course.level === "Beginner");
+    let filtered = [...courseData];
+
+    if (activeTab === "beginner") {
+      filtered = filtered.filter((course) => course.level === "Beginner");
+    } else if (activeTab === "gemiddeld") {
+      filtered = filtered.filter((course) => course.level === "Gemiddeld");
     } else if (activeTab === "gevorderd") {
-      return courseData.filter((course) => course.level === "Gevorderd");
+      filtered = filtered.filter((course) => course.level === "Gevorderd");
     } else if (activeTab === "populair") {
-      return [...courseData].sort((a, b) => b.views - a.views);
-    } else if (activeTab === "rating") {
-      return [...courseData].sort((a, b) => b.rating - a.rating);
-    } else if (activeTab === "duur") {
-      return [...courseData].sort(
-        (a, b) => parseInt(b.duration) - parseInt(a.duration)
+      filtered.sort((a, b) => b.views - a.views);
+     } else if (activeTab === "favorite") {
+      filtered = filtered.filter(course =>
+        favorites.some(fav => fav.id === course.id)
+      );
+    } else if (activeTab === "watched") {
+      filtered = filtered.filter(course =>
+        watched.includes(course.id)
       );
     }
-    return courseData;
+
+    if (searchTerm.trim() !== "") {
+      filtered = filtered.filter((course) =>
+        course.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    return filtered;
   };
 
   return (
     <section className="dashboard">
       <header className="dashboard-header">
-        <div>
-          <h3>Zoeken:</h3>
-          <SearchBar courses={courseData} />
-          <button>Zoek</button>
+        <div className="search-bar">
+          <input
+            className="search-input"
+            type="text"
+            placeholder="Zoeken"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') { setSearchTerm(query) }
+            }}
+          />
+          <button
+            className="search-button"
+            onClick={() => setSearchTerm(query)}
+          >
+            Zoeken
+          </button>
         </div>
 
         <nav className="tab-buttons">
@@ -75,28 +100,48 @@ const Dashboard = ({ courseData }) => {
           >
             Duur
           </button>
+          <button
+            className={activeTab === "watched" ? "active" : ""}
+            onClick={() => setActiveTab("watched")}
+          >
+            Bekeken
+          </button>
+          <button
+            className={activeTab === "favorites" ? "active" : ""}
+            onClick={() => setActiveTab("favorites")}
+          >
+            Favoriet
+          </button>
         </nav>
       </header>
 
       <div className="dashboard-content">
         <section className="main-content">
-          <h2>
-            {activeTab === "all"
-              ? "Alle Cursussen"
-              : activeTab === "beginner"
-              ? "Cursussen voor Beginners"
-              : activeTab === "gevorderd"
-              ? "Gevorderde Cursussen"
-              : "Meest Bekeken Cursussen"
-              ? "Rating"
-              : "Duur"}
-          </h2>
+      <h2>
+       {activeTab === "all"
+         ? "Alle Cursussen"
+         : activeTab === "beginner"
+         ? "Cursussen voor Beginners"
+         : activeTab === "gevorderd"
+         ? "Gevorderde Cursussen"
+         : activeTab === "meestbekeken"
+         ? "Meest Bekeken Cursussen"
+         : activeTab === "rating"
+         ? "Rating"
+         : activeTab === "duur"
+         ? "Duur"
+         : activeTab === "watched"
+         ? "Watched"
+         : ""}
+       </h2>
+
           <CourseList courses={filteredCourses()} />
         </section>
 
         <aside className="sidebar">
           <PopularCourses courses={courseData} />
           <Statistics courses={courseData} />
+          <p>Heb je een vraag die niet in de FAQ staat? E-mail het naar codecampus@outlook.com</p>
         </aside>
       </div>
     </section>
