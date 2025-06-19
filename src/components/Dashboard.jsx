@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "../styles/Dashboard.css";
 import CourseList from "./CourseList";
 import PopularCourses from "./PopularCourses";
@@ -7,8 +7,9 @@ import Statistics from "./Statistics";
 const Dashboard = ({ courseData }) => {
   const [activeTab, setActiveTab] = useState("all");
   const [query, setQuery] = useState("");
-  const [searchTerm, setSearchTerm] = useState('');
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [watched, setWatched] = useState([]);
+  const [favorites, setFavorites] = useState([]);
 
   const filteredCourses = () => {
     if (!courseData || !Array.isArray(courseData)) return [];
@@ -23,14 +24,22 @@ const Dashboard = ({ courseData }) => {
       filtered = filtered.filter((course) => course.level === "Gevorderd");
     } else if (activeTab === "populair") {
       filtered.sort((a, b) => b.views - a.views);
-     } else if (activeTab === "favorite") {
-      filtered = filtered.filter(course =>
-        favorites.some(fav => fav.id === course.id)
+    } else if (activeTab === "favorites") {
+      filtered = filtered.filter((course) =>
+        favorites.some((fav) => fav.id === course.id)
       );
     } else if (activeTab === "watched") {
-      filtered = filtered.filter(course =>
-        watched.includes(course.id)
+      filtered = filtered.filter((course) => watched.includes(course.id));
+    } else if (activeTab === "duration") {
+      const parseDuration = (str) => {
+        const match = str.match(/(\d+)\s*uur/i);
+        return match ? parseInt(match[1]) : 0;
+      };
+      filtered.sort(
+        (a, b) => parseDuration(a.duration) - parseDuration(b.duration)
       );
+    } else if (activeTab === "rating") {
+      filtered.sort((a, b) => Number(b.rating) - Number(a.rating));
     }
 
     if (searchTerm.trim() !== "") {
@@ -38,6 +47,7 @@ const Dashboard = ({ courseData }) => {
         course.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+
     return filtered;
   };
 
@@ -52,13 +62,12 @@ const Dashboard = ({ courseData }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') { setSearchTerm(query) }
+              if (e.key === "Enter") {
+                setSearchTerm(query);
+              }
             }}
           />
-          <button
-            className="search-button"
-            onClick={() => setSearchTerm(query)}
-          >
+          <button className="search-button" onClick={() => setSearchTerm(query)}>
             Zoeken
           </button>
         </div>
@@ -75,6 +84,12 @@ const Dashboard = ({ courseData }) => {
             onClick={() => setActiveTab("beginner")}
           >
             Voor Beginners
+          </button>
+          <button
+            className={activeTab === "gemiddeld" ? "active" : ""}
+            onClick={() => setActiveTab("gemiddeld")}
+          >
+            Gemiddeld
           </button>
           <button
             className={activeTab === "gevorderd" ? "active" : ""}
@@ -95,8 +110,8 @@ const Dashboard = ({ courseData }) => {
             Rating
           </button>
           <button
-            className={activeTab === "duur" ? "active" : ""}
-            onClick={() => setActiveTab("duur")}
+            className={activeTab === "duration" ? "active" : ""}
+            onClick={() => setActiveTab("duration")}
           >
             Duur
           </button>
@@ -110,30 +125,34 @@ const Dashboard = ({ courseData }) => {
             className={activeTab === "favorites" ? "active" : ""}
             onClick={() => setActiveTab("favorites")}
           >
-            Favoriet
+            Favorieten
           </button>
         </nav>
       </header>
 
       <div className="dashboard-content">
         <section className="main-content">
-      <h2>
-       {activeTab === "all"
-         ? "Alle Cursussen"
-         : activeTab === "beginner"
-         ? "Cursussen voor Beginners"
-         : activeTab === "gevorderd"
-         ? "Gevorderde Cursussen"
-         : activeTab === "meestbekeken"
-         ? "Meest Bekeken Cursussen"
-         : activeTab === "rating"
-         ? "Rating"
-         : activeTab === "duur"
-         ? "Duur"
-         : activeTab === "watched"
-         ? "Watched"
-         : ""}
-       </h2>
+          <h2>
+            {activeTab === "all"
+              ? "Alle Cursussen"
+              : activeTab === "beginner"
+              ? "Cursussen voor Beginners"
+              : activeTab === "gemiddeld"
+              ? "Gemiddelde Cursussen"
+              : activeTab === "gevorderd"
+              ? "Gevorderde Cursussen"
+              : activeTab === "populair"
+              ? "Meest Bekeken Cursussen"
+              : activeTab === "rating"
+              ? "Rating"
+              : activeTab === "duration"
+              ? "Duur"
+              : activeTab === "watched"
+              ? "Bekeken"
+              : activeTab === "favorites"
+              ? "Favorieten"
+              : ""}
+          </h2>
 
           <CourseList courses={filteredCourses()} />
         </section>
@@ -141,7 +160,10 @@ const Dashboard = ({ courseData }) => {
         <aside className="sidebar">
           <PopularCourses courses={courseData} />
           <Statistics courses={courseData} />
-          <p>Heb je een vraag die niet in de FAQ staat? E-mail het naar codecampus@outlook.com</p>
+          <p>
+            Heb je een vraag die niet in de FAQ staat? E-mail het naar{" "}
+            codecampus@outlook.com
+          </p>
         </aside>
       </div>
     </section>
@@ -149,3 +171,4 @@ const Dashboard = ({ courseData }) => {
 };
 
 export default Dashboard;
+
